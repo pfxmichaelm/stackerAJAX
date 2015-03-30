@@ -9,8 +9,8 @@ $(document).ready( function() {
 
 	$('.inspiration-getter').submit( function(event) {
 		$('.results').html('');
-		console.log($(this).find("input[name='tag']").val());
-		var tag = $(this).find("input[name='tag']").val();
+		console.log($(this).find("input[name='answers']").val());
+		var tag = $(this).find("input[name='answers']").val();
 		getInspiration(tag);
 	});
 });
@@ -53,12 +53,21 @@ var showAnswerers = function(answers) {
 	var result = $('.templates .answer').clone();
 
 	//set answerer properties in result
-	var answersElem = result.find('.answer-text a');
-	answersElem.attr('href', answers.link);
-	answersElem.text(answers.title);
+	var answersElem = result.find('.answer-text');
+	answersElem.text(answers.post_count);
 
-	// add rep
-}
+	var userElem = result.find('.userName');
+	userElem.text(answers.user.display_name);
+
+	var userTypeElem = result.find('.userType');
+	userTypeElem.text(answers.user.user_type);
+
+	var userRepElem = result.find('.userRep');
+	userRepElem.text(answers.user.reputation)
+
+
+	return result;
+};
 
 
 // this function takes the results object from StackOverflow
@@ -78,7 +87,7 @@ var showError = function(error){
 // takes a string of semi-colon separated tags to be searched
 // for on StackOverflow
 var getUnanswered = function(tags) {
-	console.log(tags);
+
 	// the parameters we need to pass in our request to StackOverflow's API
 	var request = {tagged: tags,
 								site: 'stackoverflow',
@@ -109,14 +118,13 @@ var getUnanswered = function(tags) {
 
 var getInspiration = function(tag) {
 	//http://api.stackexchange.com/docs/top-answerers-on-tags#tag=jquery&period=all_time&filter=default&site=stackoverflow
-
+	console.log('Tag: ' + tag);
 	// parameters needed to pass our request to stackOverflow API
 	var request = {tag: tag,
 						site: 'stackoverflow',
 						period: 'all_time',
 						filter: 'default'};
 
-	console.log(request)
 	var result = $.ajax({
 		url: "http://api.stackexchange.com/2.2/tags/" + tag + "/top-answerers/all_time?",
 		//url: "http://api.stackexchange.com/2.2/tags/%7Btag%7D/top-answerers",
@@ -130,8 +138,12 @@ var getInspiration = function(tag) {
 		$('.search-results').html(searchResults);
 
 		$.each(result.items, function(i, item) {
+			//console.log(item);
+			//console.log('Post Count: ' + item.post_count)
+			//console.log('Post Count: ' + item.post_count + ' Rep: ' + item.user.reputation + ' User Type: ' + item.user.user_type + ' User: ' + item.user.display_name);
 			var answers = showAnswerers(item);
 			$('.results').append(answers);
+
 		});
 	})
 	.fail(function(jqXHR, error, errorThrown) {
