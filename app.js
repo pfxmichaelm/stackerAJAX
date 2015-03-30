@@ -6,6 +6,12 @@ $(document).ready( function() {
 		var tags = $(this).find("input[name='tags']").val();
 		getUnanswered(tags);
 	});
+
+	$('.inspiration-getter').submit( function(event) {
+		$('.results').html('');
+		var tag = $(this).find("input[name='tag']").val();
+		getInspiration(tag);
+	});
 });
 
 // this function takes the question object returned by StackOverflow 
@@ -41,6 +47,18 @@ var showQuestion = function(question) {
 	return result;
 };
 
+var showAnswerers = function(answers) {
+	// clone the result template
+	var result = $('.templates .answer').clone();
+
+	//set answerer properties in result
+	var answersElem = result.find('.answer-text a');
+	answersElem.attr('href', answers.link);
+	answersElem.text(answers.title);
+
+	// add rep
+}
+
 
 // this function takes the results object from StackOverflow
 // and creates info about search results to be appended to DOM
@@ -59,7 +77,7 @@ var showError = function(error){
 // takes a string of semi-colon separated tags to be searched
 // for on StackOverflow
 var getUnanswered = function(tags) {
-	
+	console.log(tags);
 	// the parameters we need to pass in our request to StackOverflow's API
 	var request = {tagged: tags,
 								site: 'stackoverflow',
@@ -83,6 +101,40 @@ var getUnanswered = function(tags) {
 		});
 	})
 	.fail(function(jqXHR, error, errorThrown){
+		var errorElem = showError(error);
+		$('.search-results').append(errorElem);
+	});
+};
+
+var getInspiration = function(tag) {
+	console.log(tag);
+	http://api.stackexchange.com/docs/top-answerers-on-tags#tag=jquery&period=all_time&filter=default&site=stackoverflow
+
+	// parameters needed to pass our request to stackOverflow API
+	var request = {tag: tag,
+						site: 'stackoverflow',
+						period: 'all_time',
+						filter: 'default'};
+
+	console.log(request)
+	var result = $.ajax({
+		url: "http://api.stackexchange.com/2.2/tags/" + tag + "/top-answerers/all_time?",
+		//url: "http://api.stackexchange.com/2.2/tags/%7Btag%7D/top-answerers",
+		data: request,
+		dataType: "jsonp",
+		type: "GET",
+		})
+	.done(function(result) {
+		var searchResults = showSearchResults(request.tag, result.items.length);
+
+		$('.search-results').html(searchResults);
+
+		$.each(result.items, function(i, item) {
+			var answers = showAnswerers(item);
+			$('.results').append(answers);
+		});
+	})
+	.fail(function(jqXHR, error, errorThrown) {
 		var errorElem = showError(error);
 		$('.search-results').append(errorElem);
 	});
