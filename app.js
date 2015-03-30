@@ -9,6 +9,7 @@ $(document).ready( function() {
 
 	$('.inspiration-getter').submit( function(event) {
 		$('.results').html('');
+		console.log($(this).find("input[name='tag']").val());
 		var tag = $(this).find("input[name='tag']").val();
 		getInspiration(tag);
 	});
@@ -107,8 +108,7 @@ var getUnanswered = function(tags) {
 };
 
 var getInspiration = function(tag) {
-	console.log(tag);
-	http://api.stackexchange.com/docs/top-answerers-on-tags#tag=jquery&period=all_time&filter=default&site=stackoverflow
+	//http://api.stackexchange.com/docs/top-answerers-on-tags#tag=jquery&period=all_time&filter=default&site=stackoverflow
 
 	// parameters needed to pass our request to stackOverflow API
 	var request = {tag: tag,
